@@ -3,15 +3,10 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import moment from "moment";
 import { initializeApp } from "firebase/app";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  getDocs,
-  query,
-  doc,
-  onSnapshot,
-} from "firebase/firestore";
+import {  getFirestore, collection,addDoc, getDocs,  query,doc,onSnapshot}
+ 
+
+  from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDdX9BkXBW8TcWkcPgDH00RBoaunevOI6U",
@@ -35,6 +30,7 @@ function App() {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
+    //getting data without using realtime function start 
     //     const getData=async()=>{
     //     const querySnapshot = await getDocs(collection(db, "posts"));
     //     querySnapshot.forEach((doc) => {
@@ -49,22 +45,27 @@ function App() {
     // });
     // }
     //   getData();
-
+ //getting data without using realtime function end
+ 
+ let unsubscribe=null;
     const getRealtimeData = async () => {
 
       const q = query(collection(db, "posts"));
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const cities = [];
+       unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const posts = [];
         querySnapshot.forEach((doc) => {
-          cities.push(doc.data().name);
+          posts.push(doc.data());
+
+
         });
+        setPosts(posts);
+
         console.log("Posts: ", posts);
       });
 
-      const unsub = onSnapshot(doc(db, "posts", "SF"), (doc) => {
-        console.log("Current data: ", doc.data());
-      });
-      
+      return ()=>{
+        unsubscribe();
+      }
     }
 
     getRealtimeData();
@@ -75,15 +76,19 @@ function App() {
     // axios.get("");
     e.preventDefault();
     console.log("Post text", postText);
+    
     try {
       const docRef = await addDoc(collection(db, "posts"), {
         text: postText,
         createdOn: new Date().getTime(),
       });
+      setPostText("");
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
+
+    
   };
 
   return (
@@ -102,6 +107,7 @@ function App() {
           <div className="search">
             <input
               id="cityName"
+              value={postText}
               onChange={(e) => {
                 setPostText(e.target.value);
               }}
