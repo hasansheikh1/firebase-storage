@@ -73,9 +73,12 @@ body{
 @import url(https://fonts.googleapis.com/css?family=Open+Sans);
 
 .search {
-  width: 100%;
-  /* position: relative; */
-  display: flex;
+  /* width: 50%; */
+  
+}
+.search > input{
+
+  height:50px;
 }
 
 .searchTerm {
@@ -92,17 +95,19 @@ body{
 .searchTerm:focus{
   color: #00B4CC;
 }
-
+.allPosts{
+  margin-top: 10%;
+}
 .searchButton {
-  width: 40px;
+  width: 70px;
   height: 34px;
   border: 1px solid #00B4CC;
   background: #00B4CC;
   text-align: center;
   color: #fff;
-  border-radius: 0 5px 5px 0;
+  border-radius:10px;
   cursor: pointer;
-  font-size: 11px;
+  margin: 2px;
   padding:0px;
 }
 .searchButton:hover{
@@ -110,8 +115,12 @@ body{
 }
 /*Resize the wrap to see the search bar change!*/
 .wrap{
-  width: 80%;
- margin: auto;
+display: flex;
+width: 100%;
+align-items: center;
+justify-content: center;
+/* flex-direction: row; */
+
   /* transform: translate(-50%, -50%); */
 }
 

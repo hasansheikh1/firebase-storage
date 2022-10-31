@@ -3,9 +3,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import moment from "moment";
 import { initializeApp } from "firebase/app";
-import {  getFirestore, collection,addDoc, getDocs,  query,doc,onSnapshot}
- 
-
+import {  getFirestore, collection,addDoc, getDocs,
+   query,doc,onSnapshot, serverTimestamp,orderBy}
   from "firebase/firestore";
 
 const firebaseConfig = {
@@ -50,7 +49,7 @@ function App() {
  let unsubscribe=null;
     const getRealtimeData = async () => {
 
-      const q = query(collection(db, "posts"));
+      const q = query(collection(db, "posts"),orderBy("createdOn","desc"));
        unsubscribe = onSnapshot(q, (querySnapshot) => {
         const posts = [];
         querySnapshot.forEach((doc) => {
@@ -80,16 +79,16 @@ function App() {
     try {
       const docRef = await addDoc(collection(db, "posts"), {
         text: postText,
-        createdOn: new Date().getTime(),
+        createdOn: serverTimestamp(),
       });
       setPostText("");
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
-
-    
+  
   };
+
 
   return (
     <div className="App">
@@ -113,22 +112,24 @@ function App() {
               }}
               type="text"
               className="searchTerm"
-              placeholder="What are you looking for?"
+              placeholder="What's in your mind..?"
             />
             <button type="submit" className="searchButton">
-              Search!
+              Post
             </button>
           </div>
         </div>
 
-        {/* <div> */}
+        <div className="allPosts">
 
         {posts.map((eachPost, i) => (
           <div className="post" key={i}>
             <h1>{eachPost?.text}</h1>
 
-            <span>
-              {moment(eachPost?.datePublished).format("MMMM Do YYYY, h:mm a")}
+            <span>  
+              {moment( 
+                (eachPost?.createdOn?.seconds)?eachPost?.createdOn?.seconds*1000
+              :undefined).format("MMMM Do YYYY, h:mm a")}
             </span>
 
             <button className="btn-read">
@@ -139,7 +140,7 @@ function App() {
           </div>
         ))}
 
-        {/* </div> */}
+        </div>
       </form>
     </div>
   );
