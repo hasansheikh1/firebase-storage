@@ -3,9 +3,19 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import moment from "moment";
 import { initializeApp } from "firebase/app";
-import {  getFirestore, collection,addDoc, getDocs,
-   query,doc,onSnapshot, serverTimestamp,orderBy}
-  from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  doc,
+  onSnapshot,
+  serverTimestamp,
+  orderBy,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDdX9BkXBW8TcWkcPgDH00RBoaunevOI6U",
@@ -24,12 +34,11 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 function App() {
-  // const [data, setData] = useState([]);
   const [postText, setPostText] = useState("");
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    //getting data without using realtime function start 
+    //getting data without using realtime function start
     //     const getData=async()=>{
     //     const querySnapshot = await getDocs(collection(db, "posts"));
     //     querySnapshot.forEach((doc) => {
@@ -44,38 +53,38 @@ function App() {
     // });
     // }
     //   getData();
- //getting data without using realtime function end
- 
- let unsubscribe=null;
-    const getRealtimeData = async () => {
+    //getting data without using realtime function end
 
-      const q = query(collection(db, "posts"),orderBy("createdOn","desc"));
-       unsubscribe = onSnapshot(q, (querySnapshot) => {
+    let unsubscribe = null;
+    const getRealtimeData = async () => {
+      const q = query(collection(db, "posts"), orderBy("createdOn", "desc"));
+      unsubscribe = onSnapshot(q, (querySnapshot) => {
         const posts = [];
         querySnapshot.forEach((doc) => {
-          posts.push(doc.data());
+          // posts.push(doc.data());
+          let data = doc.data();
+          data.id = doc.id;
 
-
+          posts.push(data);
         });
         setPosts(posts);
 
         console.log("Posts: ", posts);
       });
 
-      return ()=>{
+      return () => {
         unsubscribe();
-      }
-    }
+      };
+    };
 
     getRealtimeData();
-
   }, []);
 
   const savePost = async (e) => {
     // axios.get("");
     e.preventDefault();
     console.log("Post text", postText);
-    
+
     try {
       const docRef = await addDoc(collection(db, "posts"), {
         text: postText,
@@ -86,22 +95,26 @@ function App() {
     } catch (e) {
       console.error("Error adding document: ", e);
     }
-  
   };
 
+  const deletePosts = async (postId) => {
+    // console.log("post Id: ",postId);
+    await deleteDoc(doc(db, "posts", postId));
+
+  };
+
+  const updatePost = async (postId, updatedText) => {
+    const washingtonRef = doc(db, "posts", postId);
+    // Set the "capital" field of the city 'DC'
+
+    await updateDoc(doc(db, "posts", postId), {
+      text: updatedText,
+    });
+  };
 
   return (
     <div className="App">
       <form onSubmit={savePost}>
-        {/* <input
-          type="text"
-          id="cityName"
-          onChange={(e) => {
-            setQuery(e.target.value);
-          }}
-          placeholder="Enter City.."
-        /> */}
-
         <div className="wrap">
           <div className="search">
             <input
@@ -119,29 +132,52 @@ function App() {
             </button>
           </div>
         </div>
+      </form>
 
-        <div className="allPosts">
-
+      <div className="allPosts">
         {posts.map((eachPost, i) => (
           <div className="post" key={i}>
-            <h1>{eachPost?.text}</h1>
+            <h1>
+              {eachPost.isEditing ? <input type="text" /> : eachPost?.text}
+            </h1>
 
-            <span>  
-              {moment( 
-                (eachPost?.createdOn?.seconds)?eachPost?.createdOn?.seconds*1000
-              :undefined).format("MMMM Do YYYY, h:mm a")}
+            <span>
+              {moment(
+                eachPost?.createdOn?.seconds
+                  ? eachPost?.createdOn?.seconds * 1000
+                  : undefined
+              ).format("MMMM Do YYYY, h:mm a")}
             </span>
+            <br />
+            <button
+              className="del"
+              onClick={() => {
+                deletePosts(eachPost?.id);
+              }}
+            >
+              Delete
+            </button>
+            
+            <button
+              className="btn-read"
+              onClick={() => {
+                
+                const updatedState = posts.map((eachItem) => {
+                  if (eachItem.id === eachPost?.id) {
+                    return { ...eachItem, isEditing: !eachItem.isEditing };
+                  } else {
+                    return eachItem;
+                  }
+                });
 
-            <button className="btn-read">
-              <a className="btn-read1" target="_blank" href={eachPost.url}>
-                Read More
-              </a>
+                setPosts(updatedState);
+              }}
+            >
+              Edit
             </button>
           </div>
         ))}
-
-        </div>
-      </form>
+      </div>
     </div>
   );
 }

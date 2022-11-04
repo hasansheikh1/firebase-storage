@@ -7,7 +7,8 @@
 }
 
 body{
-  background:#242729;
+  /* background:#242729; */
+  background-color:azure;
 }
 .post{
 
@@ -19,8 +20,8 @@ body{
   border-radius: 10px;
   /* background-color:#f1f2f3; */
   background:#292f33;
-  display: flex;
-  flex-direction: column;
+  /* display: flex;
+  flex-direction: column; */
   margin: auto;
   margin-top: 10px;
 }
@@ -40,14 +41,18 @@ body{
   width: 100%;
 }
 
+
 .btn-read{
-  width: 20%;
-  height: 40px;
-  border-radius: 10px;
+  width: 80px;
+  height: 35px;
+  padding: 5px;
+  border-radius: 5px;
   background-color: #277bfc;
   color: #fff;
-  outline: none;
-  border: 1px solid rgb(52, 52, 253);
+  border:none;
+  margin: 5px;
+  font-size: 15px; 
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; 
 }
 .btn-read1{
   width: 20%;
@@ -84,10 +89,9 @@ body{
 .searchTerm {
   width: 100%;
   border: 2px solid #00B4CC;
-  border-right: none;
   padding: 5px;
   height: 20px;
-  border-radius: 5px 0 0 5px;
+  border-radius:5px;
   outline: none;
   color: #9DBFAF;
 }
@@ -127,6 +131,24 @@ justify-content: center;
 .post>img{
   border-radius: 10px;
   
+}
+
+
+.del{
+  width: 80px;
+  height: 35px;
+  border-radius: 5px;
+  border: none;
+  background:#cf2b34;
+  opacity: 0.9;
+  color: #fff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 15px; 
+  padding: 5px;
+}
+.del:hover{
+ cursor: pointer;
+  opacity: 1;
 }
 
 @media (prefers-reduced-motion: no-preference) {
