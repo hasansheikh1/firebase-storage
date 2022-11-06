@@ -34,8 +34,19 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 function App() {
+
   const [postText, setPostText] = useState("");
   const [posts, setPosts] = useState([]);
+  // const [isEditing,setIsEditing]=useState(null);
+  // const [editingText,isEditingText]=useState("");
+  
+  const[editing,setEditing]=useState({
+
+    editingId:null,
+    editingText:""
+
+  })
+
 
   useEffect(() => {
     //getting data without using realtime function start
@@ -103,14 +114,41 @@ function App() {
 
   };
 
-  const updatePost = async (postId, updatedText) => {
-    const washingtonRef = doc(db, "posts", postId);
+  const updatePost = async (e) => {
+   
     // Set the "capital" field of the city 'DC'
+    e.preventDefault();
 
-    await updateDoc(doc(db, "posts", postId), {
-      text: updatedText,
+    await updateDoc(doc(db, "posts", editing.editingId), {
+      text: editing.editingText,
     });
+
+    setEditing({
+        editingId:null,
+        editingText:""
+    })
+
   };
+
+  // const edit = (postId,Text)=>{
+
+    // setIsEditing(postId)
+    // setEditingText(Text)
+
+
+
+    // const updatedState = posts.map((eachItem) => {
+    //   if (eachItem.id === postId) {
+    //     return { ...eachItem, isEditing: !eachItem.isEditing };
+    //   } else {
+    //     return eachItem;
+    //   }
+    // });
+
+    // setPosts(updatedState);
+
+  // }
+
 
   return (
     <div className="App">
@@ -138,7 +176,23 @@ function App() {
         {posts.map((eachPost, i) => (
           <div className="post" key={i}>
             <h1>
-              {eachPost.isEditing ? <input type="text" /> : eachPost?.text}
+              {(eachPost.id===editing.editingId)?
+              <form onSubmit={updatePost}>
+              <input 
+              type="text" 
+              value={editing.editingText}
+              onChange={(e)=>{
+
+                setEditing({...editing, editingText:e.target.value})
+              }}
+              placeholder="Enter updated text" /> 
+              
+              <button>Update</button>
+
+              </form>
+              : 
+              eachPost?.text
+              }
             </h1>
 
             <span>
@@ -158,23 +212,27 @@ function App() {
               Delete
             </button>
             
+          { (editing.editingId===eachPost?.id)? "" 
+            :
             <button
               className="btn-read"
               onClick={() => {
-                
-                const updatedState = posts.map((eachItem) => {
-                  if (eachItem.id === eachPost?.id) {
-                    return { ...eachItem, isEditing: !eachItem.isEditing };
-                  } else {
-                    return eachItem;
-                  }
-                });
 
-                setPosts(updatedState);
+                // edit(eachPost?.id,eachPost?.text);
+              
+                          
+                setEditing({
+
+                // ...editing,
+                editingId:eachPost?.id,
+                editingText:eachPost?.text
+
+              })
+
               }}
             >
               Edit
-            </button>
+            </button>}
           </div>
         ))}
       </div>
